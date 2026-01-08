@@ -1,16 +1,17 @@
-# ペットホテル機能追加ハンズオン
+# ペットホテル機能追加ハンズオン - エージェント活用版
 
 ## 概要
 
-このハンズオンでは、Spring PetClinic REST アプリケーションに「ペットホテル機能」を追加することで、Issue Driven Development のワークフローを学びます。
+このハンズオンでは、Spring PetClinic REST アプリケーションに「ペットホテル機能」を追加することで、Issue Driven Development のワークフローと **GitHub Copilot カスタムエージェント** の活用方法を学びます。
 
 **所要時間**: 約300分（5時間）
 
 **学習目標**:
-- Issue の作成とラベル管理
+- Issue Driven Development の実践
+- GitHub Copilot カスタムエージェントの活用
+- 開発工程ごとの適切なエージェント選択
 - ブランチ戦略とGitワークフロー
 - Pull Request の作成とコードレビュー
-- マージとクローズの一連の流れ
 
 ## 前提条件
 
@@ -19,23 +20,40 @@
 - Git
 - GitHub アカウント
 - IDE (IntelliJ IDEA, Eclipse, VS Code など)
+- **GitHub Copilot サブスクリプション**
+
+## エージェントベース開発フロー
+
+このハンズオンでは、開発工程ごとに専門のエージェントを活用します：
+
+| 工程 | エージェントロール | 主な役割 |
+|------|-------------------|---------|
+| 要求開発 | プロダクトマネージャー (PM) | Issue作成、要件定義 |
+| 基本設計 | ソフトウェアアーキテクト | システム構造設計、エンティティ設計 |
+| 詳細設計 | テックリード | API設計、データベース設計 |
+| 実装 | シニアデベロッパー | コード実装 |
+| 単体テスト | QA エンジニア | テストコード作成 |
+| 統合・総合テスト | QA エンジニア/QA マネージャー | API動作確認、品質保証 |
+| 受け入れ | リード | PR作成、レビュー、マージ |
 
 ## タイムテーブル
 
-| 時間 | 内容 |
-|------|------|
-| 0:00-0:30 | セクション1: 環境セットアップと既存機能の理解 |
-| 0:30-1:00 | セクション2: Issue 作成とラベル管理 |
-| 1:00-1:30 | セクション3: 機能設計とブランチ作成 |
-| 1:30-4:00 | セクション4: 機能実装 |
-| 4:00-4:30 | セクション5: Pull Request 作成とレビュー |
-| 4:30-5:00 | セクション6: マージと振り返り |
+| 時間 | セクション | エージェント | 内容 |
+|------|----------|-------------|------|
+| 0:00-0:30 | セクション0 | - | 環境セットアップと既存機能の理解 |
+| 0:30-1:00 | セクション1 | PM | 要求開発（Issue作成） |
+| 1:00-1:30 | セクション2 | アーキテクト | 基本設計（システム構造・エンティティ設計） |
+| 1:30-2:00 | セクション3 | テックリード | 詳細設計（API・DB設計） |
+| 2:00-3:30 | セクション4 | シニアデベロッパー | 実装 |
+| 3:30-4:00 | セクション5 | QA エンジニア | 単体テスト |
+| 4:00-4:30 | セクション6 | QA エンジニア/マネージャー | 統合・総合テスト |
+| 4:30-5:00 | セクション7 | リード | 受け入れとマージ |
 
 ---
 
-## セクション1: 環境セットアップと既存機能の理解 (30分)
+## セクション0: 環境セットアップと既存機能の理解 (30分)
 
-### 1.1 リポジトリのフォークとクローン
+### 0.1 リポジトリのフォークとクローン
 
 1. GitHub で spring-petclinic-rest リポジトリをフォーク
 2. ローカルにクローン:
@@ -45,7 +63,7 @@ git clone https://github.com/YOUR_USERNAME/spring-petclinic-rest.git
 cd spring-petclinic-rest
 ```
 
-### 1.2 アプリケーションの起動
+### 0.2 アプリケーションの起動
 
 ```bash
 # ビルドとテスト実行
@@ -57,7 +75,7 @@ mvn spring-boot:run
 
 アプリケーションは `http://localhost:9966` で起動します。
 
-### 1.3 既存 API の確認
+### 0.3 既存 API の確認
 
 Swagger UI でAPIを確認: `http://localhost:9966/petclinic`
 
@@ -76,7 +94,7 @@ curl http://localhost:9966/petclinic/api/pets
 curl http://localhost:9966/petclinic/api/pets/1
 ```
 
-### 1.4 既存コードの構造理解
+### 0.4 既存コードの構造理解
 
 以下のファイルを確認し、パターンを理解してください:
 
@@ -105,11 +123,44 @@ curl http://localhost:9966/petclinic/api/pets/1
 
 ---
 
-## セクション2: Issue 作成とラベル管理 (30分)
+## セクション1: 要求開発 - PM エージェント活用 (30分)
 
-### 2.1 GitHub Labels の作成
+### 1.1 PM エージェントの役割
 
-まず、プロジェクトで使用するラベルを作成します。
+プロダクトマネージャーエージェントは以下をサポートします：
+- ビジネス要件の整理
+- ユーザーストーリーの作成
+- Issue の構造化
+- 受け入れ基準の定義
+
+### 1.2 PM エージェントへのプロンプト例
+
+```
+@pm 以下のビジネス要件に基づいて、GitHub Issueを作成してください：
+
+【背景】
+ペットクリニックを訪れる飼い主から、旅行や出張中にペットを預かってほしいという要望が多く寄せられている。
+
+【目的】
+ペットホテル機能を実装し、予約管理ができるようにする。
+
+【既存システム】
+- Visit エンティティでペットの来院記録を管理している
+- Pet エンティティでペット情報を管理している
+- REST APIでCRUD操作を提供している
+
+【必要な機能】
+- チェックイン日・チェックアウト日の記録
+- 部屋番号の管理
+- ステータス管理（予約済み、チェックイン済み、チェックアウト済み）
+- REST APIでの予約管理
+
+既存のVisitパターンを参考に、シンプルで実装可能なIssueを作成してください。
+```
+
+### 1.3 GitHub Labels の作成
+
+PM エージェントと相談しながら、プロジェクトで使用するラベルを作成します。
 
 GitHub リポジトリの **Issues** タブ → **Labels** に移動し、以下のラベルを作成:
 
@@ -119,13 +170,14 @@ GitHub リポジトリの **Issues** タブ → **Labels** に移動し、以下
 | `feature` | #0075ca | フィーチャー実装 |
 | `backend` | #d93f0b | バックエンド関連 |
 | `database` | #fbca04 | データベース変更 |
-| `good first issue` | #7057ff | 初心者向け |
 
-### 2.2 メインIssueの作成
+### 1.4 Issue 作成
+
+PM エージェントの出力を基に、GitHub で Issue を作成します。
 
 **Issue タイトル**: `ペットホテル機能の追加`
 
-**Issue 本文テンプレート**:
+**Issue 本文** (PM エージェントが生成):
 
 ```markdown
 ## 概要
@@ -134,122 +186,53 @@ GitHub リポジトリの **Issues** タブ → **Labels** に移動し、以下
 ## 背景
 クリニックを訪れる飼い主から、旅行や出張中にペットを預かってほしいという要望が多く寄せられている。
 
-## 要件
+## ユーザーストーリー
+- 飼い主として、ペットを預ける予約ができる
+- スタッフとして、予約状況を確認できる
+- スタッフとして、チェックイン・チェックアウトを記録できる
 
-### 機能要件
+## 機能要件
 - ペットホテルの予約情報を管理できる
 - チェックイン日とチェックアウト日を記録できる
 - 部屋番号を管理できる
-- ステータス管理（予約済み、チェックイン済み、チェックアウト済み）
+- ステータス管理（RESERVED, CHECKED_IN, CHECKED_OUT）
 - REST APIで予約のCRUD操作ができる
 
-### 非機能要件
+## 非機能要件
 - 既存のコード構造とパターンに従う
 - 適切なテストを含める
-- OpenAPI仕様に準拠する
-
-## 実装タスク
-
-- [ ] データベーススキーマ追加
-- [ ] PetHotelStay エンティティ作成
-- [ ] Repository インターフェース作成
-- [ ] Service メソッド追加
-- [ ] DTO と Mapper 作成
-- [ ] REST Controller 実装
-- [ ] テストコード作成
-- [ ] OpenAPI仕様更新
-
-## 技術的考慮事項
-- Visit エンティティのパターンを参考にする
-- 既存の Pet との関連付けを活用する
-- Spring Data JPA を使用する
-- MapStruct でDTO変換を行う
+- セキュリティ設定を適用する
 
 ## 受け入れ基準
 - [ ] すべてのテストがパスする
 - [ ] API経由でペットホテル予約のCRUD操作ができる
 - [ ] 既存機能に影響を与えない
 - [ ] コードレビューで承認される
+
+## 技術的制約
+- Visit エンティティのパターンを参考にする
+- 既存の Pet との関連付けを活用する
+- Spring Data JPA を使用する
 ```
 
-**演習**: 上記の内容で Issue を作成し、以下のラベルを付与してください:
-- `enhancement`
-- `feature`
-- `backend`
-- `database`
-
-### 2.3 タスク分割（オプション）
-
-大きなIssueを小さなタスクに分割することも可能です。例:
-- Issue #2: データベーススキーマとエンティティ作成
-- Issue #3: Repository と Service 実装
-- Issue #4: REST API 実装
-
-今回のハンズオンでは、1つの Issue で進めます。
+**演習**:
+1. PM エージェントと対話しながらIssueを洗練させる
+2. Issue を GitHub に作成
+3. 適切なラベルを付与（`enhancement`, `feature`, `backend`, `database`）
 
 ---
 
-## セクション3: 機能設計とブランチ作成 (30分)
+## セクション2: 基本設計 - アーキテクトエージェント活用 (30分)
 
-### 3.1 機能設計
+### 2.1 アーキテクトエージェントの役割
 
-ペットホテル機能の設計を行います。既存の `Visit` パターンを参考にします。
+ソフトウェアアーキテクトエージェントは以下をサポートします：
+- システムアーキテクチャの設計
+- エンティティモデルの設計
+- 既存パターンとの整合性確認
+- 技術選択の推奨
 
-#### 3.1.1 エンティティ設計
-
-**PetHotelStay エンティティ**:
-
-```java
-@Entity
-@Table(name = "pet_hotel_stays")
-public class PetHotelStay extends BaseEntity {
-
-    @Column(name = "check_in_date")
-    private LocalDate checkInDate;
-
-    @Column(name = "check_out_date")
-    private LocalDate checkOutDate;
-
-    @Column(name = "room_number")
-    private String roomNumber;
-
-    @Column(name = "status")
-    private String status; // RESERVED, CHECKED_IN, CHECKED_OUT
-
-    @ManyToOne
-    @JoinColumn(name = "pet_id")
-    private Pet pet;
-}
-```
-
-#### 3.1.2 データベーススキーマ
-
-```sql
-CREATE TABLE pet_hotel_stays (
-    id INTEGER IDENTITY PRIMARY KEY,
-    pet_id INTEGER NOT NULL,
-    check_in_date DATE,
-    check_out_date DATE,
-    room_number VARCHAR(10),
-    status VARCHAR(20)
-);
-
-ALTER TABLE pet_hotel_stays
-    ADD CONSTRAINT fk_pet_hotel_stay_pet
-    FOREIGN KEY (pet_id) REFERENCES pets(id);
-```
-
-#### 3.1.3 REST API設計
-
-| メソッド | エンドポイント | 説明 |
-|---------|---------------|------|
-| GET | /api/pethotelstays | すべての予約一覧 |
-| GET | /api/pethotelstays/{id} | 特定の予約取得 |
-| POST | /api/pethotelstays | 新規予約作成 |
-| PUT | /api/pethotelstays/{id} | 予約更新 |
-| DELETE | /api/pethotelstays/{id} | 予約削除 |
-
-### 3.2 ブランチ作成
+### 2.2 ブランチ作成
 
 Git-Flow に従い、feature ブランチを作成します:
 
@@ -265,17 +248,259 @@ git checkout -b feature/pet-hotel
 git branch
 ```
 
-**命名規則**: `feature/` + `issue番号または機能名`
+### 2.3 アーキテクトエージェントへのプロンプト例
+
+```
+@architect 以下の既存コードベースを分析して、ペットホテル機能の基本設計を行ってください：
+
+【既存エンティティ】
+- Visit: ペットの来院記録（pet, date, description）
+- Pet: ペット情報（name, birthDate, type, owner）
+- Owner: 飼い主情報
+
+【要件】
+- チェックイン日・チェックアウト日の記録
+- 部屋番号の管理
+- ステータス管理（RESERVED, CHECKED_IN, CHECKED_OUT）
+- Pet との関連付け
+
+【制約】
+- Visit と同様のパターンを踏襲する
+- 既存のレイヤー構造（Entity, Repository, Service, Controller）に従う
+
+以下を設計してください：
+1. PetHotelStay エンティティの構造
+2. Pet エンティティとの関係
+3. 必要なフィールドとデータ型
+4. JPA アノテーション
+```
+
+### 2.4 エンティティ設計
+
+アーキテクトエージェントの出力例：
+
+**PetHotelStay エンティティ設計**:
+
+```java
+@Entity
+@Table(name = "pet_hotel_stays")
+public class PetHotelStay extends BaseEntity {
+
+    @Column(name = "check_in_date")
+    @NotNull
+    private LocalDate checkInDate;
+
+    @Column(name = "check_out_date")
+    @NotNull
+    private LocalDate checkOutDate;
+
+    @Column(name = "room_number")
+    private String roomNumber;
+
+    @Column(name = "status")
+    @NotNull
+    private String status; // RESERVED, CHECKED_IN, CHECKED_OUT
+
+    @ManyToOne
+    @JoinColumn(name = "pet_id")
+    @NotNull
+    private Pet pet;
+
+    // Getters and Setters
+}
+```
+
+### 2.5 アーキテクチャ確認
+
+アーキテクトエージェントと以下を確認：
+
+```
+@architect 以下の点について確認してください：
+
+1. Visit パターンとの一貫性は保たれていますか？
+2. BaseEntity の継承は適切ですか？
+3. Pet との ManyToOne 関係は適切ですか？
+4. status フィールドは String で良いですか、それとも Enum にすべきですか？
+5. 他に考慮すべきアーキテクチャ上の懸念点はありますか？
+```
+
+**演習**:
+1. アーキテクトエージェントとエンティティ設計を詰める
+2. 設計ドキュメントとして記録（メモやコメント）
 
 ---
 
-## セクション4: 機能実装 (150分)
+## セクション3: 詳細設計 - テックリードエージェント活用 (30分)
 
-### 4.1 データベーススキーマ追加 (20分)
+### 3.1 テックリードエージェントの役割
 
-#### ステップ1: H2スキーマファイル編集
+テックリードエージェントは以下をサポートします：
+- データベーススキーマ設計
+- REST API 設計
+- セキュリティ設計
+- 実装詳細の決定
 
-`src/main/resources/db/h2/schema.sql` を編集し、以下を追加:
+### 3.2 テックリードエージェントへのプロンプト例（データベース設計）
+
+```
+@techlead 以下のエンティティに対応するデータベーススキーマを設計してください：
+
+【エンティティ】
+PetHotelStay
+- id: Integer (主キー)
+- checkInDate: LocalDate
+- checkOutDate: LocalDate
+- roomNumber: String
+- status: String
+- pet: Pet (ManyToOne)
+
+【既存テーブル】
+- pets (id, name, birth_date, type_id, owner_id)
+- visits (id, pet_id, visit_date, description)
+
+【要件】
+- H2 データベース用のスキーマ
+- 適切な外部キー制約
+- インデックスの設定
+- テストデータの準備
+
+CREATE TABLE文とサンプルINSERT文を生成してください。
+```
+
+### 3.3 データベーススキーマ設計
+
+テックリードエージェントの出力例：
+
+```sql
+CREATE TABLE IF NOT EXISTS pet_hotel_stays (
+  id INTEGER IDENTITY PRIMARY KEY,
+  pet_id INTEGER NOT NULL,
+  check_in_date DATE,
+  check_out_date DATE,
+  room_number VARCHAR(10),
+  status VARCHAR(20)
+);
+
+ALTER TABLE pet_hotel_stays
+  ADD CONSTRAINT fk_pet_hotel_stay_pet
+  FOREIGN KEY (pet_id) REFERENCES pets (id);
+
+CREATE INDEX idx_pet_hotel_stay_pet_id
+  ON pet_hotel_stays (pet_id);
+
+-- テストデータ
+INSERT INTO pet_hotel_stays VALUES (1, 7, '2023-01-05', '2023-01-10', 'R101', 'CHECKED_OUT');
+INSERT INTO pet_hotel_stays VALUES (2, 8, '2023-02-15', '2023-02-20', 'R102', 'CHECKED_OUT');
+INSERT INTO pet_hotel_stays VALUES (3, 8, '2023-12-20', '2023-12-27', 'R103', 'RESERVED');
+```
+
+### 3.4 REST API 設計
+
+テックリードエージェントへのプロンプト例（API設計）：
+
+```
+@techlead ペットホテル予約管理のREST APIを設計してください：
+
+【既存パターン】
+- Visit API: GET/POST/PUT/DELETE /api/visits
+- Pet API: GET/POST/PUT/DELETE /api/pets
+
+【要件】
+- RESTful な設計
+- 適切なHTTPメソッド
+- 適切なステータスコード
+- セキュリティ設定（@PreAuthorize）
+
+以下を含めてください：
+1. エンドポイント一覧
+2. リクエスト/レスポンス形式
+3. HTTPステータスコード
+4. 必要なロール
+```
+
+テックリードエージェントの出力例：
+
+| メソッド | エンドポイント | 説明 | ステータスコード | ロール |
+|---------|---------------|------|----------------|--------|
+| GET | /api/pethotelstays | すべての予約一覧 | 200 OK | OWNER_ADMIN |
+| GET | /api/pethotelstays/{id} | 特定の予約取得 | 200 OK / 404 NOT_FOUND | OWNER_ADMIN |
+| POST | /api/pethotelstays | 新規予約作成 | 201 CREATED | OWNER_ADMIN |
+| PUT | /api/pethotelstays/{id} | 予約更新 | 200 OK / 404 NOT_FOUND | OWNER_ADMIN |
+| DELETE | /api/pethotelstays/{id} | 予約削除 | 204 NO_CONTENT / 404 NOT_FOUND | OWNER_ADMIN |
+
+**リクエスト例 (POST)**:
+```json
+{
+  "checkInDate": "2024-03-01",
+  "checkOutDate": "2024-03-05",
+  "roomNumber": "R201",
+  "status": "RESERVED",
+  "petId": 1
+}
+```
+
+**レスポンス例 (GET)**:
+```json
+{
+  "id": 1,
+  "checkInDate": "2024-03-01",
+  "checkOutDate": "2024-03-05",
+  "roomNumber": "R201",
+  "status": "RESERVED",
+  "petId": 1
+}
+```
+
+### 3.5 詳細設計レビュー
+
+```
+@techlead 以下の設計をレビューしてください：
+
+1. データベーススキーマに不足はありませんか？
+2. API設計は RESTful ですか？
+3. セキュリティ上の懸念はありますか？
+4. パフォーマンス上の問題はありますか？
+5. 他に考慮すべき点はありますか？
+```
+
+**演習**:
+1. テックリードエージェントとDB設計を詰める
+2. API設計を確認
+3. 設計書を作成（ドキュメントまたはコメント）
+
+---
+
+## セクション4: 実装 - シニアデベロッパーエージェント活用 (90分)
+
+### 4.1 シニアデベロッパーエージェントの役割
+
+シニアデベロッパーエージェントは以下をサポートします：
+- 高品質なコード実装
+- 既存パターンの踏襲
+- ベストプラクティスの適用
+- コードレビュー観点の提供
+
+### 4.2 データベーススキーマ追加 (15分)
+
+#### ステップ1: スキーマファイル編集
+
+```
+@senior-dev 以下の設計に基づいて、H2データベーススキーマを実装してください：
+
+【ファイル】
+src/main/resources/db/h2/schema.sql
+
+【追加するテーブル】
+pet_hotel_stays テーブル（id, pet_id, check_in_date, check_out_date, room_number, status）
+
+【制約】
+- 外部キー: pet_id -> pets(id)
+- インデックス: pet_id
+
+既存のスキーマファイルに追記する形でSQLを生成してください。
+```
+
+シニアデベロッパーエージェントの出力を `src/main/resources/db/h2/schema.sql` に追加:
 
 ```sql
 CREATE TABLE IF NOT EXISTS pet_hotel_stays (
@@ -292,7 +517,12 @@ CREATE INDEX idx_pet_hotel_stay_pet_id ON pet_hotel_stays (pet_id);
 
 #### ステップ2: テストデータ追加
 
-`src/main/resources/db/h2/data.sql` を編集し、サンプルデータを追加:
+```
+@senior-dev src/main/resources/db/h2/data.sql にサンプルデータを追加してください。
+3件のペットホテル予約データを生成してください。
+```
+
+`src/main/resources/db/h2/data.sql` に追加:
 
 ```sql
 INSERT INTO pet_hotel_stays VALUES (1, 7, '2023-01-05', '2023-01-10', 'R101', 'CHECKED_OUT');
@@ -303,15 +533,31 @@ INSERT INTO pet_hotel_stays VALUES (3, 8, '2023-12-20', '2023-12-27', 'R103', 'R
 #### ステップ3: コミット
 
 ```bash
-git add src/main/resources/db/h2/schema.sql src/main/resources/db/h2/data.sql
+git add src/main/resources/db/h2/
 git commit -m "Add pet_hotel_stays table schema and test data"
 ```
 
-### 4.2 Entity 作成 (25分)
+### 4.3 Entity 作成 (15分)
 
-#### ステップ1: PetHotelStay エンティティ作成
+```
+@senior-dev 以下の設計に基づいて PetHotelStay エンティティを実装してください：
 
-`src/main/java/org/springframework/samples/petclinic/model/PetHotelStay.java` を作成:
+【パッケージ】
+org.springframework.samples.petclinic.model
+
+【設計】
+- BaseEntity を継承
+- フィールド: checkInDate (LocalDate), checkOutDate (LocalDate), roomNumber (String), status (String), pet (Pet)
+- JPA アノテーション: @Entity, @Table, @Column, @ManyToOne, @JoinColumn, @NotNull
+- getter/setter メソッド
+
+【参考】
+Visit.java と同様のパターンで実装してください。
+
+完全なJavaコードを生成してください。
+```
+
+シニアデベロッパーエージェントの出力を `src/main/java/org/springframework/samples/petclinic/model/PetHotelStay.java` に保存:
 
 ```java
 package org.springframework.samples.petclinic.model;
@@ -344,7 +590,6 @@ public class PetHotelStay extends BaseEntity {
     @NotNull
     private Pet pet;
 
-    // Getters and Setters
     public LocalDate getCheckInDate() {
         return this.checkInDate;
     }
@@ -387,18 +632,32 @@ public class PetHotelStay extends BaseEntity {
 }
 ```
 
-#### ステップ2: コミット
-
+コミット:
 ```bash
 git add src/main/java/org/springframework/samples/petclinic/model/PetHotelStay.java
 git commit -m "Add PetHotelStay entity"
 ```
 
-### 4.3 Repository 作成 (20分)
+### 4.4 Repository 作成 (15分)
 
-#### ステップ1: Repository インターフェース作成
+```
+@senior-dev VisitRepository のパターンに従って、PetHotelStay 用の Repository を実装してください：
 
-`src/main/java/org/springframework/samples/petclinic/repository/PetHotelStayRepository.java` を作成:
+【必要なファイル】
+1. PetHotelStayRepository.java (インターフェース)
+2. SpringDataPetHotelStayRepository.java (Spring Data JPA実装)
+
+【メソッド】
+- findById(int id)
+- findAll()
+- save(PetHotelStay)
+- delete(PetHotelStay)
+- findByPetId(Integer petId) - カスタムクエリ
+
+完全なJavaコードを2ファイル分生成してください。
+```
+
+#### ファイル1: `src/main/java/org/springframework/samples/petclinic/repository/PetHotelStayRepository.java`
 
 ```java
 package org.springframework.samples.petclinic.repository;
@@ -422,9 +681,7 @@ public interface PetHotelStayRepository {
 }
 ```
 
-#### ステップ2: Spring Data JPA 実装
-
-`src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/SpringDataPetHotelStayRepository.java` を作成:
+#### ファイル2: `src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/SpringDataPetHotelStayRepository.java`
 
 ```java
 package org.springframework.samples.petclinic.repository.springdatajpa;
@@ -458,56 +715,60 @@ public interface SpringDataPetHotelStayRepository extends PetHotelStayRepository
 }
 ```
 
-#### ステップ3: コミット
-
+コミット:
 ```bash
 git add src/main/java/org/springframework/samples/petclinic/repository/
 git commit -m "Add PetHotelStay repository"
 ```
 
-### 4.4 Service 実装 (25分)
+### 4.5 Service 実装 (15分)
 
-#### ステップ1: ClinicService インターフェース更新
+```
+@senior-dev ClinicService に PetHotelStay 関連のメソッドを追加してください：
 
-`src/main/java/org/springframework/samples/petclinic/service/ClinicService.java` に以下のメソッドを追加:
+【ファイル】
+1. ClinicService.java (インターフェース) - メソッド定義を追加
+2. ClinicServiceImpl.java (実装) - フィールド、コンストラクタ、メソッド実装を追加
 
+【メソッド】
+- findPetHotelStayById(int id)
+- findAllPetHotelStays()
+- savePetHotelStay(PetHotelStay)
+- deletePetHotelStay(PetHotelStay)
+- findPetHotelStaysByPetId(Integer petId)
+
+【注意】
+- @Transactional アノテーションを適切に使用
+- 読み取り専用は @Transactional(readOnly = true)
+
+差分形式で追加すべきコードを提示してください。
+```
+
+シニアデベロッパーエージェントの指示に従い、以下を追加：
+
+**ClinicService.java に追加**:
 ```java
 // PetHotelStay関連メソッド
 PetHotelStay findPetHotelStayById(int id) throws DataAccessException;
-
 Collection<PetHotelStay> findAllPetHotelStays() throws DataAccessException;
-
 void savePetHotelStay(PetHotelStay petHotelStay) throws DataAccessException;
-
 void deletePetHotelStay(PetHotelStay petHotelStay) throws DataAccessException;
-
 Collection<PetHotelStay> findPetHotelStaysByPetId(Integer petId) throws DataAccessException;
 ```
 
-#### ステップ2: ClinicServiceImpl 実装更新
-
-`src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java` を更新:
-
-1. PetHotelStayRepository をフィールドに追加:
-
+**ClinicServiceImpl.java に追加**:
 ```java
 private final PetHotelStayRepository petHotelStayRepository;
-```
 
-2. コンストラクタに追加:
-
-```java
+// コンストラクタに追加
 public ClinicServiceImpl(
     // ... 既存のパラメータ
     PetHotelStayRepository petHotelStayRepository) {
     // ... 既存の初期化
     this.petHotelStayRepository = petHotelStayRepository;
 }
-```
 
-3. メソッド実装を追加:
-
-```java
+// メソッド実装
 @Override
 @Transactional(readOnly = true)
 public PetHotelStay findPetHotelStayById(int id) throws DataAccessException {
@@ -539,18 +800,34 @@ public Collection<PetHotelStay> findPetHotelStaysByPetId(Integer petId) throws D
 }
 ```
 
-#### ステップ3: コミット
-
+コミット:
 ```bash
 git add src/main/java/org/springframework/samples/petclinic/service/
 git commit -m "Add PetHotelStay service methods"
 ```
 
-### 4.5 DTO と Mapper 作成 (25分)
+### 4.6 DTO と Mapper 作成 (15分)
 
-#### ステップ1: DTO クラス作成
+```
+@senior-dev VisitDto/VisitMapper のパターンに従って、PetHotelStay 用の DTO と Mapper を実装してください：
 
-`src/main/java/org/springframework/samples/petclinic/rest/dto/PetHotelStayDto.java` を作成:
+【必要なファイル】
+1. PetHotelStayDto.java - レスポンス用DTO（idを含む）
+2. PetHotelStayFieldsDto.java - リクエスト用DTO（idを含まない）
+3. PetHotelStayMapper.java - MapStruct マッパー
+
+【フィールド】
+- checkInDate, checkOutDate, roomNumber, status, petId
+
+【注意】
+- @JsonFormat でLocalDateをフォーマット
+- @NotNull でバリデーション
+- MapStruct で pet.id <-> petId のマッピング
+
+完全なJavaコードを3ファイル分生成してください。
+```
+
+#### ファイル1: `src/main/java/org/springframework/samples/petclinic/rest/dto/PetHotelStayDto.java`
 
 ```java
 package org.springframework.samples.petclinic.rest.dto;
@@ -630,7 +907,7 @@ public class PetHotelStayDto {
 }
 ```
 
-`src/main/java/org/springframework/samples/petclinic/rest/dto/PetHotelStayFieldsDto.java` を作成:
+#### ファイル2: `src/main/java/org/springframework/samples/petclinic/rest/dto/PetHotelStayFieldsDto.java`
 
 ```java
 package org.springframework.samples.petclinic.rest.dto;
@@ -700,9 +977,7 @@ public class PetHotelStayFieldsDto {
 }
 ```
 
-#### ステップ2: Mapper 作成
-
-`src/main/java/org/springframework/samples/petclinic/mapper/PetHotelStayMapper.java` を作成:
+#### ファイル3: `src/main/java/org/springframework/samples/petclinic/mapper/PetHotelStayMapper.java`
 
 ```java
 package org.springframework.samples.petclinic.mapper;
@@ -731,16 +1006,35 @@ public interface PetHotelStayMapper {
 }
 ```
 
-#### ステップ3: コミット
-
+コミット:
 ```bash
 git add src/main/java/org/springframework/samples/petclinic/rest/dto/ src/main/java/org/springframework/samples/petclinic/mapper/
 git commit -m "Add PetHotelStay DTOs and Mapper"
 ```
 
-### 4.6 REST Controller 実装 (35分)
+### 4.7 REST Controller 実装 (15分)
 
-#### ステップ1: Controller クラス作成
+```
+@senior-dev VisitRestController のパターンに従って、PetHotelStayRestController を実装してください：
+
+【エンドポイント】
+- GET /api/pethotelstays - 全件取得
+- GET /api/pethotelstays/{id} - 1件取得
+- POST /api/pethotelstays - 新規作成
+- PUT /api/pethotelstays/{id} - 更新
+- DELETE /api/pethotelstays/{id} - 削除
+
+【セキュリティ】
+- @PreAuthorize("hasRole(@roles.OWNER_ADMIN)")
+
+【ステータスコード】
+- GET: 200 OK / 404 NOT_FOUND
+- POST: 201 CREATED (Location ヘッダー付き)
+- PUT: 200 OK / 404 NOT_FOUND
+- DELETE: 204 NO_CONTENT / 404 NOT_FOUND
+
+完全なJavaコードを生成してください。
+```
 
 `src/main/java/org/springframework/samples/petclinic/rest/controller/PetHotelStayRestController.java` を作成:
 
@@ -839,16 +1133,52 @@ public class PetHotelStayRestController {
 }
 ```
 
-#### ステップ2: コミット
-
+コミット:
 ```bash
 git add src/main/java/org/springframework/samples/petclinic/rest/controller/PetHotelStayRestController.java
 git commit -m "Add PetHotelStay REST controller"
 ```
 
-### 4.7 テストコード作成 (25分)
+---
 
-#### ステップ1: Controller テスト作成
+## セクション5: 単体テスト - QA エンジニアエージェント活用 (30分)
+
+### 5.1 QA エンジニアエージェントの役割
+
+QA エンジニアエージェントは以下をサポートします：
+- 包括的なテストケース設計
+- エッジケースの洗い出し
+- モックの適切な使用
+- テストコード実装
+
+### 5.2 QA エージェントへのプロンプト例
+
+```
+@qa-engineer PetHotelStayRestController の単体テストを実装してください：
+
+【参考】
+VisitRestControllerTests.java のパターンに従ってください。
+
+【テストケース】
+1. getPetHotelStaySuccess - 正常取得
+2. getPetHotelStayNotFound - 存在しないID
+3. listPetHotelStaysSuccess - 一覧取得
+4. createPetHotelStaySuccess - 正常作成
+5. updatePetHotelStaySuccess - 正常更新
+6. updatePetHotelStayNotFound - 存在しないID更新
+7. deletePetHotelStaySuccess - 正常削除
+8. deletePetHotelStayNotFound - 存在しないID削除
+
+【要件】
+- MockMvc を使用
+- @WithMockUser でセキュリティテスト
+- ClinicService をモック
+- JSON形式の検証
+
+完全なJavaコードを生成してください。
+```
+
+### 5.3 テストコード実装
 
 `src/test/java/org/springframework/samples/petclinic/rest/controller/PetHotelStayRestControllerTests.java` を作成:
 
@@ -866,7 +1196,6 @@ import org.springframework.samples.petclinic.mapper.PetHotelStayMapper;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetHotelStay;
 import org.springframework.samples.petclinic.rest.advice.ExceptionControllerAdvice;
-import org.springframework.samples.petclinic.rest.dto.PetHotelStayDto;
 import org.springframework.samples.petclinic.rest.dto.PetHotelStayFieldsDto;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -1047,7 +1376,7 @@ class PetHotelStayRestControllerTests {
 }
 ```
 
-#### ステップ2: テスト実行
+### 5.4 テスト実行
 
 ```bash
 # 新しいテストのみ実行
@@ -1057,34 +1386,89 @@ mvn test -Dtest=PetHotelStayRestControllerTests
 mvn test
 ```
 
-#### ステップ3: コミット
-
+コミット:
 ```bash
 git add src/test/java/org/springframework/samples/petclinic/rest/controller/PetHotelStayRestControllerTests.java
 git commit -m "Add PetHotelStay controller tests"
 ```
 
-### 4.8 動作確認 (20分)
+---
 
-#### ステップ1: アプリケーション起動
+## セクション6: 統合・総合テスト - QA エンジニア/QA マネージャーエージェント活用 (30分)
+
+### 6.1 QA マネージャーエージェントの役割
+
+QA マネージャーエージェントは以下をサポートします：
+- 統合テストシナリオの設計
+- エンドツーエンドテスト
+- 品質基準の確認
+- テスト報告書作成
+
+### 6.2 アプリケーション起動とビルド確認
+
+```
+@qa-manager アプリケーションの統合テストを実施します。
+以下の確認項目でテストシナリオを提案してください：
+
+1. すべての単体テストがパスするか
+2. アプリケーションが正常に起動するか
+3. データベースマイグレーションが正常に動作するか
+4. 全APIエンドポイントが正常に動作するか
+5. 既存機能に影響がないか
+```
+
+### 6.3 ビルドとテスト実行
 
 ```bash
+# 完全ビルド
+mvn clean install
+
+# アプリケーション起動
 mvn spring-boot:run
 ```
 
-#### ステップ2: API テスト
+### 6.4 API 統合テスト
 
-**すべての予約取得**:
+QA マネージャーエージェントへのプロンプト：
+
+```
+@qa-manager 以下のAPIエンドポイントをcurlでテストするスクリプトを作成してください：
+
+【認証】
+- ユーザー: admin
+- パスワード: admin
+
+【エンドポイント】
+1. GET /api/pethotelstays - 一覧取得（期待: 200 OK）
+2. GET /api/pethotelstays/1 - 特定取得（期待: 200 OK）
+3. POST /api/pethotelstays - 新規作成（期待: 201 CREATED）
+4. PUT /api/pethotelstays/{id} - 更新（期待: 200 OK）
+5. DELETE /api/pethotelstays/{id} - 削除（期待: 204 NO_CONTENT）
+
+各テストケースの期待結果とアサーションを含めてください。
+```
+
+### 6.5 手動テスト実行
+
+**テストケース1: すべての予約取得**
 ```bash
 curl -u admin:admin http://localhost:9966/petclinic/api/pethotelstays
 ```
 
-**特定の予約取得**:
+**期待結果**: 200 OK、3件の予約データ
+
+---
+
+**テストケース2: 特定の予約取得**
 ```bash
 curl -u admin:admin http://localhost:9966/petclinic/api/pethotelstays/1
 ```
 
-**新規予約作成**:
+**期待結果**: 200 OK、id=1 の予約データ
+
+---
+
+**テストケース3: 新規予約作成**
 ```bash
 curl -u admin:admin -X POST http://localhost:9966/petclinic/api/pethotelstays \
   -H "Content-Type: application/json" \
@@ -1097,7 +1481,11 @@ curl -u admin:admin -X POST http://localhost:9966/petclinic/api/pethotelstays \
   }'
 ```
 
-**予約更新**:
+**期待結果**: 201 CREATED、Location ヘッダー、作成された予約データ
+
+---
+
+**テストケース4: 予約更新**
 ```bash
 curl -u admin:admin -X PUT http://localhost:9966/petclinic/api/pethotelstays/1 \
   -H "Content-Type: application/json" \
@@ -1110,50 +1498,98 @@ curl -u admin:admin -X PUT http://localhost:9966/petclinic/api/pethotelstays/1 \
   }'
 ```
 
-**予約削除**:
+**期待結果**: 200 OK、更新された予約データ
+
+---
+
+**テストケース5: 予約削除**
 ```bash
 curl -u admin:admin -X DELETE http://localhost:9966/petclinic/api/pethotelstays/3
 ```
 
+**期待結果**: 204 NO_CONTENT
+
 ---
 
-## セクション5: Pull Request 作成とレビュー (30分)
-
-### 5.1 最終確認
-
-#### ステップ1: すべてのテスト実行
-
+**テストケース6: 既存機能への影響確認**
 ```bash
-mvn clean test
+# Pet API が正常に動作するか確認
+curl -u admin:admin http://localhost:9966/petclinic/api/pets
+
+# Visit API が正常に動作するか確認
+curl -u admin:admin http://localhost:9966/petclinic/api/visits
 ```
 
-すべてのテストがパスすることを確認してください。
+**期待結果**: 両方とも 200 OK、既存データが正常に取得できる
 
-#### ステップ2: コミット履歴の確認
+### 6.6 テスト報告書作成
 
-```bash
-git log --oneline
+```
+@qa-manager 以下のテスト結果を基に、テスト報告書を作成してください：
+
+【実施したテスト】
+- 単体テスト: 8件すべてパス
+- ビルドテスト: 成功
+- 統合テスト: 6つのAPIエンドポイントすべて正常動作
+- 既存機能確認: Pet API, Visit API ともに正常動作
+
+【不具合】
+なし
+
+【品質評価】
+すべてのテストがパスし、既存機能に影響なし。リリース可能。
 ```
 
-適切なコミットメッセージになっているか確認してください。
+---
 
-### 5.2 リモートへプッシュ
+## セクション7: 受け入れとマージ - リードエージェント活用 (30分)
+
+### 7.1 リードエージェントの役割
+
+リードエージェントは以下をサポートします：
+- Pull Request の品質確認
+- コードレビュー観点の提示
+- マージ判断
+- ドキュメント確認
+
+### 7.2 リモートへプッシュ
 
 ```bash
 git push origin feature/pet-hotel
 ```
 
-### 5.3 Pull Request 作成
+### 7.3 Pull Request 作成
 
-#### ステップ1: GitHub でPR作成
+リードエージェントへのプロンプト：
 
-1. GitHub リポジトリページに移動
-2. "Compare & pull request" ボタンをクリック
-3. 以下の内容でPRを作成:
+```
+@lead 以下の変更内容に基づいて、Pull Request の説明文を作成してください：
+
+【変更内容】
+- データベーススキーマ追加: pet_hotel_stays テーブル
+- PetHotelStay エンティティ追加
+- PetHotelStayRepository 追加
+- ClinicService 拡張
+- PetHotelStayRestController 追加
+- DTO と Mapper 追加
+- テストコード追加（8件）
+
+【テスト結果】
+- すべての単体テストがパス
+- 統合テストが正常動作
+- 既存機能に影響なし
+
+【Issue】
+Closes #1
+
+適切なPR説明文とチェックリストを作成してください。
+```
+
+GitHub で Pull Request を作成:
 
 **PRタイトル**: `ペットホテル機能の追加`
 
-**PR説明**:
+**PR説明** (リードエージェントが生成):
 
 ```markdown
 ## 概要
@@ -1165,24 +1601,35 @@ Closes #1
 
 ### データベース
 - `pet_hotel_stays` テーブルを追加
-- サンプルデータを追加
+- 外部キー制約とインデックスを設定
+- サンプルデータを3件追加
 
 ### バックエンド
 - `PetHotelStay` エンティティを追加
 - `PetHotelStayRepository` インターフェースと実装を追加
 - `ClinicService` にペットホテル関連メソッドを追加
 - `PetHotelStayDto` と `PetHotelStayFieldsDto` を追加
-- `PetHotelStayMapper` を追加
+- `PetHotelStayMapper` を追加（MapStruct）
 - `PetHotelStayRestController` を追加
 
 ### テスト
 - `PetHotelStayRestControllerTests` を追加
-- すべてのCRUD操作のテストケースを実装
+- 8件のテストケースを実装（すべてパス）
+
+## 開発プロセス
+
+各工程でGitHub Copilot カスタムエージェントを活用：
+- 要求開発: PM エージェント
+- 基本設計: アーキテクトエージェント
+- 詳細設計: テックリードエージェント
+- 実装: シニアデベロッパーエージェント
+- 単体テスト: QA エンジニアエージェント
+- 統合・総合テスト: QA エンジニア/マネージャーエージェント
 
 ## テスト結果
 ```bash
 mvn test
-# すべてのテストがパス
+# Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 ```
 
 ## 動作確認
@@ -1199,50 +1646,54 @@ mvn test
 - [x] セキュリティ（@PreAuthorize）が設定されている
 - [x] コミットメッセージが明確
 - [x] 既存機能に影響がない
+- [x] エージェント活用による品質確保
 
-## スクリーンショット
-（APIテストの実行結果や動作確認のスクリーンショットを追加）
+## レビュー観点
+1. コード品質とスタイルの統一性
+2. エラーハンドリングの適切性
+3. セキュリティ設定
+4. テストカバレッジ
+5. データベース設計
 ```
 
-### 5.4 コードレビュー
+### 7.4 コードレビュー
 
-#### レビューポイント
+リードエージェントへのプロンプト：
 
-レビュアーは以下の点を確認してください:
+```
+@lead 以下のファイルをレビューしてください：
 
-1. **コード品質**
-   - [ ] 既存のコーディングスタイルに従っているか
-   - [ ] 命名規則が適切か
-   - [ ] 不要なコードがないか
+【レビュー観点】
+1. コード品質
+2. 既存パターンとの整合性
+3. セキュリティ
+4. パフォーマンス
+5. 保守性
 
-2. **機能性**
-   - [ ] すべてのCRUD操作が実装されているか
-   - [ ] エラーハンドリングが適切か
-   - [ ] バリデーションが適切か
+【ファイル】
+- PetHotelStay.java
+- PetHotelStayRestController.java
+- PetHotelStayRestControllerTests.java
 
-3. **テスト**
-   - [ ] テストカバレッジが十分か
-   - [ ] エッジケースがテストされているか
-   - [ ] テストが実際にパスするか
+改善提案があれば指摘してください。
+```
 
-4. **セキュリティ**
-   - [ ] 認証・認可が適切に設定されているか
-   - [ ] SQLインジェクション対策ができているか
-
-5. **データベース**
-   - [ ] スキーマ設計が適切か
-   - [ ] インデックスが適切に設定されているか
-   - [ ] 外部キー制約が適切か
-
-#### レビューコメントの例
+リードエージェントのレビュー例：
 
 ```markdown
-## 全体的な評価
-実装パターンが既存コードに統一されており、良好です。
+## コードレビュー結果
 
-## 詳細コメント
+### 全体評価
+✅ 実装パターンが既存コードに統一されており、良好です。
 
-### PetHotelStay.java:15
+### 詳細コメント
+
+#### PetHotelStay.java
+✅ BaseEntity の継承が適切
+✅ JPA アノテーションが正しい
+✅ バリデーションが適切
+
+💡 改善提案:
 `status` フィールドをStringではなくEnumにすることを検討してください。
 これにより、タイプセーフティが向上します。
 
@@ -1252,117 +1703,111 @@ public enum StayStatus {
 }
 ```
 
-### PetHotelStayRestController.java:45
+#### PetHotelStayRestController.java
+✅ セキュリティ設定が適切
+✅ HTTPステータスコードが正しい
+✅ エラーハンドリングが適切
+
+💡 改善提案:
 `checkInDate` が `checkOutDate` より後の日付でないかのバリデーションを追加することをお勧めします。
 
-### 良い点
-- テストカバレッジが十分
-- エラーハンドリングが適切
-- セキュリティ設定が正しい
+#### PetHotelStayRestControllerTests.java
+✅ テストカバレッジが十分
+✅ モックが適切に使用されている
+✅ エッジケースがテストされている
+
+### 総評
+**承認**: マージ可能です。上記の改善提案は将来的な課題として記録してください。
 ```
 
-#### ステップ2: レビューへの対応
-
-レビューコメントを受けて修正が必要な場合:
-
-```bash
-# 修正を実施
-git add .
-git commit -m "Apply review feedback: Add validation for check-in/out dates"
-git push origin feature/pet-hotel
-```
-
-PRは自動的に更新されます。
-
----
-
-## セクション6: マージと振り返り (30分)
-
-### 6.1 マージ
-
-#### ステップ1: レビュー承認後
+### 7.5 マージ
 
 レビューが承認されたら、以下の手順でマージします:
 
 1. GitHub PR画面で "Merge pull request" をクリック
-2. マージ方法を選択:
-   - **Merge commit**: すべてのコミット履歴を保持
-   - **Squash and merge**: 1つのコミットにまとめる（推奨）
-   - **Rebase and merge**: リベースしてマージ
-
+2. **Squash and merge** を選択（推奨）
 3. "Confirm merge" をクリック
 
-#### ステップ2: ブランチ削除
-
 ```bash
-# リモートブランチ削除（GitHubで自動削除も可能）
-git push origin --delete feature/pet-hotel
-
-# ローカルブランチ削除
+# ローカルで master を更新
 git checkout master
 git pull origin master
+
+# feature ブランチ削除
 git branch -d feature/pet-hotel
 ```
 
-#### ステップ3: Issue クローズ
+### 7.6 振り返り
 
-PR がマージされると、関連する Issue が自動的にクローズされます（PR説明に `Closes #1` と記載した場合）。
+リードエージェントと振り返り：
 
-### 6.2 振り返り
+```
+@lead 今回のハンズオンを振り返ってください：
 
-#### 学習した内容の確認
+【良かった点】
+【改善点】
+【学んだこと】
+【次のアクション】
+```
 
-1. **Issue Driven Development**
-   - Issue で要件を明確化
-   - ラベルでカテゴリ分類
-   - タスクを細分化
-
-2. **Git ワークフロー**
-   - feature ブランチの作成
-   - 小さなコミットの積み重ね
-   - リモートへのプッシュ
-
-3. **Pull Request プロセス**
-   - 詳細な説明の記載
-   - レビュアーへの配慮
-   - フィードバックへの対応
-
-4. **コードレビュー**
-   - 品質の観点
-   - セキュリティの観点
-   - 保守性の観点
-
-5. **Spring Boot 開発**
-   - エンティティ設計
-   - Repository パターン
-   - Service レイヤー
-   - REST Controller
-   - DTO と Mapper
-
-#### 改善点の議論
-
-- より効率的なワークフローはあったか？
-- コミット粒度は適切だったか？
-- テストは十分だったか？
-- ドキュメントは必要か？
+**演習**:
+1. 各工程でのエージェント活用の効果を振り返る
+2. Issue Driven Development の理解度を確認
+3. 次回への改善点を記録
 
 ---
+
+## まとめ
+
+このハンズオンを通じて、以下のスキルを習得しました:
+
+✅ **Issue Driven Development** の実践
+✅ **GitHub Copilot カスタムエージェント** の活用
+✅ 工程ごとの適切なエージェント選択
+✅ Git のブランチ戦略
+✅ Pull Request の作成と管理
+✅ コードレビューのプロセス
+✅ Spring Boot での REST API 開発
+✅ テスト駆動開発の基礎
+
+## エージェント活用のまとめ
+
+| 工程 | エージェント | 活用ポイント |
+|------|------------|------------|
+| 要求開発 | PM | ビジネス要件を技術要件に変換 |
+| 基本設計 | アーキテクト | 既存パターンとの整合性確保 |
+| 詳細設計 | テックリード | 実装可能な詳細設計 |
+| 実装 | シニアデベロッパー | 高品質なコード生成 |
+| 単体テスト | QA エンジニア | 包括的なテストケース |
+| 統合・総合テスト | QA エンジニア/マネージャー | エンドツーエンド品質保証 |
+| 受け入れ | リード | 全体品質確認とマージ判断 |
 
 ## 追加課題（時間がある場合）
 
 ### 課題1: ステータス管理の改善
 
-`status` フィールドを Enum に変更してタイプセーフティを向上させる。
+```
+@senior-dev `status` フィールドをStringからEnumに変更してください。
+
+StayStatus Enum を作成し、PetHotelStay エンティティを更新してください。
+```
 
 ### 課題2: バリデーション強化
 
-- チェックイン日がチェックアウト日より前であることを検証
-- 同じ部屋番号で期間が重複しないことを検証
+```
+@senior-dev 以下のバリデーションを実装してください：
+
+1. チェックイン日がチェックアウト日より前であることを検証
+2. 同じ部屋番号で期間が重複しないことを検証
+
+カスタムバリデーターを作成してください。
+```
 
 ### 課題3: 統計API追加
 
-現在の稼働状況を取得するAPIを追加:
 ```
+@techlead 現在の稼働状況を取得するAPIを設計・実装してください：
+
 GET /api/pethotelstays/statistics
 {
   "totalRooms": 10,
@@ -1373,25 +1818,11 @@ GET /api/pethotelstays/statistics
 
 ### 課題4: ペット別の履歴取得
 
-特定のペットのホテル利用履歴を取得するAPIを追加:
 ```
+@techlead 特定のペットのホテル利用履歴を取得するAPIを追加してください：
+
 GET /api/pets/{petId}/hotelstays
 ```
-
----
-
-## まとめ
-
-このハンズオンを通じて、以下のスキルを習得しました:
-
-✅ Issue Driven Development の実践
-✅ Git のブランチ戦略
-✅ Pull Request の作成と管理
-✅ コードレビューのプロセス
-✅ Spring Boot での REST API 開発
-✅ テスト駆動開発の基礎
-
-次のステップとして、実際のプロジェクトでこのワークフローを実践してみてください。
 
 ---
 
@@ -1400,40 +1831,39 @@ GET /api/pets/{petId}/hotelstays
 - [Spring PetClinic REST](https://github.com/spring-petclinic/spring-petclinic-rest)
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
 - [GitHub Flow](https://guides.github.com/introduction/flow/)
-- [Code Review Best Practices](https://google.github.io/eng-practices/review/)
+- [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
 
 ---
 
 ## トラブルシューティング
 
-### Q1: テストが失敗する
+### Q1: エージェントが期待通りの出力をしない
+
+**A**: プロンプトを具体的にし、参考ファイルや期待する出力形式を明示してください。
+
+### Q2: テストが失敗する
 
 **A**: 以下を確認してください:
 - MapStruct の生成クラスがビルドされているか（`mvn clean compile`）
 - データベーススキーマが正しく適用されているか
 - モックの設定が適切か
 
-### Q2: API が 401 エラーを返す
+### Q3: API が 401 エラーを返す
 
 **A**: 認証情報を確認してください:
 ```bash
 curl -u admin:admin http://localhost:9966/petclinic/api/pethotelstays
 ```
 
-### Q3: PR がマージできない
+### Q4: エージェントの選択に迷う
 
-**A**: 以下を確認してください:
-- すべてのテストがパスしているか
-- コンフリクトが発生していないか
-- 必要な承認を得ているか
-
-### Q4: MapStruct のコンパイルエラー
-
-**A**: 以下を実行してください:
-```bash
-mvn clean install -DskipTests
-```
+**A**: 以下を参考にしてください:
+- 「何を作るか」を決める → PM
+- 「どう設計するか」を決める → アーキテクト/テックリード
+- 「どう実装するか」を決める → シニアデベロッパー
+- 「どうテストするか」を決める → QA エンジニア/マネージャー
+- 「どう判断するか」を決める → リード
 
 ---
 
-**ハンズオン資料 バージョン 1.0**
+**ハンズオン資料 エージェント活用版 バージョン 2.0**
