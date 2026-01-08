@@ -16,8 +16,8 @@ body:
     id: requirement_issue
     attributes:
       label: 要求Issue番号
-      description: 前工程（要求開発）のIssue番号
-      placeholder: "#123"
+      description: 前工程（要求開発）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #123, #124 または #123 #124）
+      placeholder: "#123" または "#123, #124"
     validations:
       required: true
 

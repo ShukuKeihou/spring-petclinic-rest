@@ -25,9 +25,13 @@
 
 ## 対応Issue
 
-- Phase X Issue: #<Issue番号>
-- 前工程 Issue（該当する場合）: #<Issue番号>
-- 要求開発 Issue (Phase 1): #<Issue番号>
+<!-- 複数のIssueが関連する場合は、すべて記載してください（例：#123, #124, #125） -->
+
+- Phase X Issue: #<Issue番号>（複数可：#123, #124）
+- 前工程 Issue（該当する場合）: #<Issue番号>（複数可）
+- 要求開発 Issue (Phase 1): #<Issue番号>（複数可）
+
+**Note**: Issue Driven Developmentの観点から、複数の関連Issueをまとめて対応する場合は、すべてのIssue番号を記載してください。
 
 ## この工程の成果物
 
