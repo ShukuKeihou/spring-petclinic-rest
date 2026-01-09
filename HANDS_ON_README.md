@@ -13,7 +13,7 @@
 | **HANDS_ON_GUIDE.md** | メインガイド | 全参加者 |
 | **QUICK_REFERENCE.md** | コマンド・パス集 | 全参加者 |
 | **AGENT_PROMPT_GUIDE.md** | エージェント活用ガイド | 全参加者 |
-| **.github/ISSUE_TEMPLATE/*.yml** | 工程別Issue Formテンプレート（7種類） | 全参加者 |
+| **.github/ISSUE_TEMPLATE/*.yml** | 工程別Issue Formテンプレート（6種類） | 全参加者 |
 | **PR_TEMPLATE.md** | PR作成用テンプレート | 全参加者 |
 | **INSTRUCTOR_GUIDE.md** | 指導用ガイド | 講師のみ |
 
@@ -129,13 +129,13 @@ mvn spring-boot:run
 - 構造化されたフォーム形式で必要な情報を入力
 - 自動的に適切なラベルが付与されます
 
-**7つの Issue Form**:
+**6つの Issue Form**:
 1. `01_requirement.yml` - Phase 1: 要求開発
 2. `02_basic_design.yml` - Phase 2: 基本設計
 3. `03_detailed_design.yml` - Phase 3: 詳細設計
 4. `04_implementation.yml` - Phase 4: 実装と単体テスト
-5. `05_unit_test.yml` - Phase 5: 統合テスト
-6. `06_integration_test.yml` - Phase 6: 受け入れ/レビュー
+5. `05_integration_test.yml` - Phase 5: 統合テスト
+6. `06_acceptance_review.yml` - Phase 6: 受け入れ/レビュー
 
 ### PR_TEMPLATE.md
 - セクション5でPull Requestを作成する際に使用
@@ -218,77 +218,81 @@ PetHotelStay
 
 ## 📊Issue Driven Development ワークフロー
 
-このハンズオンは、**7つの工程（Phase 1-7）**に分かれており、各工程ごとに **Issue → 作業 → PR → 承認 → マージ** のサイクルを繰り返します。
+このハンズオンは、**6つの工程（Phase 1-6）**に分かれており、各工程ごとに **Issue → 作業 → PR → 承認 → マージ** のサイクルを繰り返します。
 
-```
-Phase 1: 要求開発
-  ↓
-  Issue #1 作成 (要件定義)
-  ↓
-  docs/phase1-requirements.md 作成
-  ↓
-  PR #1 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #1 クローズ
-  ↓
-Phase 2: 基本設計
-  ↓
-  Issue #2 作成 (#1 を参照)
-  ↓
-  docs/phase2-basic-design.md 作成
-  ↓
-  PR #2 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #2 クローズ
-  ↓
-Phase 3: 詳細設計
-  ↓
-  Issue #3 作成 (#2 を参照)
-  ↓
-  docs/phase3-detailed-design.md 作成
-  ↓
-  PR #3 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #3 クローズ
-  ↓
-Phase 4: 実装と単体テスト
-  ↓
-  Issue #4 作成 (#3 を参照)
-  ↓
-  feature/pet-hotel ブランチで実装 (Entity, Repository, Service, Controller, etc.)
-  ↓
-  PR #4 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #4 クローズ
-  ↓
-Phase 5: 統合テスト
-  ↓
-  Issue #5 作成 (#4 を参照)
-  ↓
-  テストコード実装 + カバレッジレポート
-  ↓
-  PR #5 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #5 クローズ
-  ↓
-Phase 6: 受け入れ/レビュー
-  ↓
-  Issue #6 作成 (#5 を参照)
-  ↓
-  API統合テスト実施 (curl/Postman)
-  ↓
-  PR #6 作成 → レビュー → 承認 → マージ
-  ↓
-  Issue #6 クローズ
-  ↓
-  ↓
-  Issue #7 作成 (#6 を参照)
-  ↓
-  全体レビュー + 振り返り
-  ↓
-  Issue #7 クローズ
-  ↓
-全工程完了。
+```mermaid
+flowchart TD
+    Start(["スタート"]) --> P1_Start["Phase 1: 要求開発"]
+    
+    P1_Start --> P1_Issue["Issue #1 作成<br/>要件定義"]
+    P1_Issue --> P1_Doc["docs/phase1-requirements.md<br/>作成"]
+    P1_Doc --> P1_PR["PR #1 作成"]
+    P1_PR --> P1_Review["レビュー"]
+    P1_Review --> P1_Approve{"承認?"}
+    P1_Approve -->|Yes| P1_Merge["マージ"]
+    P1_Approve -->|No| P1_Doc
+    P1_Merge --> P1_Close["Issue #1 クローズ"]
+    
+    P1_Close --> P2_Start["Phase 2: 基本設計"]
+    P2_Start --> P2_Issue["Issue #2 作成<br/>#1 を参照"]
+    P2_Issue --> P2_Doc["docs/phase2-basic-design.md<br/>作成"]
+    P2_Doc --> P2_PR["PR #2 作成"]
+    P2_PR --> P2_Review["レビュー"]
+    P2_Review --> P2_Approve{"承認?"}
+    P2_Approve -->|Yes| P2_Merge["マージ"]
+    P2_Approve -->|No| P2_Doc
+    P2_Merge --> P2_Close["Issue #2 クローズ"]
+    
+    P2_Close --> P3_Start["Phase 3: 詳細設計"]
+    P3_Start --> P3_Issue["Issue #3 作成<br/>#2 を参照"]
+    P3_Issue --> P3_Doc["docs/phase3-detailed-design.md<br/>作成"]
+    P3_Doc --> P3_PR["PR #3 作成"]
+    P3_PR --> P3_Review["レビュー"]
+    P3_Review --> P3_Approve{"承認?"}
+    P3_Approve -->|Yes| P3_Merge["マージ"]
+    P3_Approve -->|No| P3_Doc
+    P3_Merge --> P3_Close["Issue #3 クローズ"]
+    
+    P3_Close --> P4_Start["Phase 4: 実装と単体テスト"]
+    P4_Start --> P4_Issue["Issue #4 作成<br/>#3 を参照"]
+    P4_Issue --> P4_Impl["feature/pet-hotel ブランチで実装<br/>Entity, Repository, Service, Controller"]
+    P4_Impl --> P4_Test["単体テスト実装<br/>カバレッジレポート"]
+    P4_Test --> P4_PR["PR #4 作成"]
+    P4_PR --> P4_Review["レビュー"]
+    P4_Review --> P4_Approve{"承認?"}
+    P4_Approve -->|Yes| P4_Merge["マージ"]
+    P4_Approve -->|No| P4_Impl
+    P4_Merge --> P4_Close["Issue #4 クローズ"]
+    
+    P4_Close --> P5_Start["Phase 5: 統合テスト"]
+    P5_Start --> P5_Issue["Issue #5 作成<br/>#4 を参照"]
+    P5_Issue --> P5_Test["API統合テスト実施<br/>curl/Postman"]
+    P5_Test --> P5_PR["PR #5 作成"]
+    P5_PR --> P5_Review["レビュー"]
+    P5_Review --> P5_Approve{"承認?"}
+    P5_Approve -->|Yes| P5_Merge["マージ"]
+    P5_Approve -->|No| P5_Test
+    P5_Merge --> P5_Close["Issue #5 クローズ"]
+    
+    P5_Close --> P6_Start["Phase 6: 受け入れ/レビュー"]
+    P6_Start --> P6_Issue["Issue #6 作成<br/>#5 を参照"]
+    P6_Issue --> P6_Review_Work["全体レビュー<br/>振り返り"]
+    P6_Review_Work --> P6_PR["PR #6 作成"]
+    P6_PR --> P6_Review["レビュー"]
+    P6_Review --> P6_Approve{"承認?"}
+    P6_Approve -->|Yes| P6_Merge["マージ"]
+    P6_Approve -->|No| P6_Review_Work
+    P6_Merge --> P6_Close["Issue #6 クローズ"]
+    
+    P6_Close --> Complete(["全工程完了"])
+    
+    style P1_Start fill:#e1f5ff
+    style P2_Start fill:#e1f5ff
+    style P3_Start fill:#e1f5ff
+    style P4_Start fill:#e1f5ff
+    style P5_Start fill:#e1f5ff
+    style P6_Start fill:#e1f5ff
+    style Complete fill:#90EE90
 ```
 
 ### 🎯 IDD のメリット
@@ -303,24 +307,24 @@ Phase 6: 受け入れ/レビュー
 
 ## 📊 工程別ワークフロー
 
-このハンズオンは、7つの工程（Phase）に分かれており、各工程ごとに Issue を作成して進めます：
+このハンズオンは、6つの工程（Phase）に分かれており、各工程ごとに Issue を作成して進めます：
 
-```
-Phase 1 (要求開発)
-  ↓ Issue #1 作成・完了
-Phase 2 (基本設計)
-  ↓ Issue #2 作成（#1 を参照）・完了
-Phase 3 (詳細設計)
-  ↓ Issue #3 作成（#2 を参照）・完了
-Phase 4 (実装)
-  ↓ Issue #4 作成（#3 を参照）・完了
-Phase 5 (単体テスト)
-  ↓ Issue #5 作成（#4 を参照）・完了
-Phase 6 (統合テスト)
-  ↓ Issue #6 作成（#5 を参照）・完了
-Phase 7 (受け入れ/レビュー)
-  ↓ Issue #7 作成（#6 を参照）・完了
-完了・全 Issue クローズ
+```mermaid
+flowchart TD
+    P1["Phase 1<br/>要求開発"] -->|"Issue #1 作成・完了"| P2["Phase 2<br/>基本設計"]
+    P2 -->|"Issue #2 作成（#1 を参照）・完了"| P3["Phase 3<br/>詳細設計"]
+    P3 -->|"Issue #3 作成（#2 を参照）・完了"| P4["Phase 4<br/>実装と単体テスト"]
+    P4 -->|"Issue #4 作成（#3 を参照）・完了"| P5["Phase 5<br/>統合テスト"]
+    P5 -->|"Issue #5 作成（#4 を参照）・完了"| P6["Phase 6<br/>受け入れ/レビュー"]
+    P6 -->|"Issue #6 作成（#5 を参照）・完了"| Done(["完了<br/>全 Issue クローズ"])
+    
+    style P1 fill:#e3f2fd
+    style P2 fill:#e3f2fd
+    style P3 fill:#e3f2fd
+    style P4 fill:#fff3e0
+    style P5 fill:#f3e5f5
+    style P6 fill:#e8f5e9
+    style Done fill:#4caf50,color:#fff
 ```
 
 **各工程の完了条件**:
@@ -343,7 +347,7 @@ Phase 7 (受け入れ/レビュー)
 ### Git / GitHub
 - ✅ feature ブランチ
 - ✅ 適切なコミット履歴
-- ✅ 7つの工程別 Issue（Phase 1-7）
+- ✅ 6つの工程別 Issue（Phase 1-6）
 - ✅ 工程ごとのラベル管理
 - ✅ Issue 間の依存関係の記録
 - ✅ Pull Request（レビュー済み）
