@@ -16,8 +16,8 @@ body:
     id: implementation_issue
     attributes:
       label: 実装Issue番号
-      description: 前工程（実装）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #126, #127 または #126 #127）
-      placeholder: "#126" または "#126, #127"
+      description: 前工程（実装）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#126, \#127 または \#126 \#127）
+      placeholder: #126 または #126, #127
     validations:
       required: true
 

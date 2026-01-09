@@ -16,8 +16,8 @@ body:
     id: detailed_design_issue
     attributes:
       label: 詳細設計Issue番号
-      description: 前工程（詳細設計）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #125, #126 または #125 #126）
-      placeholder: "#125" または "#125, #126"
+      description: 前工程（詳細設計）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#125, \#126 または \#125 \#126）
+      placeholder: #125 または #125, #126
     validations:
       required: true
 

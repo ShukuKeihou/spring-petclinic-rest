@@ -16,8 +16,8 @@ body:
     id: basic_design_issue
     attributes:
       label: 基本設計Issue番号
-      description: 前工程（基本設計）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #124, #125 または #124 #125）
-      placeholder: "#124" または "#124, #125"
+      description: 前工程（基本設計）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#124, \#125 または \#124 \#125）
+      placeholder: #124 または #124, #125
     validations:
       required: true
 

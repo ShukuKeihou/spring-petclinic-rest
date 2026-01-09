@@ -11,13 +11,13 @@ body:
         ## 工程2: 基本設計
         この工程では、システムアーキテクチャとエンティティモデルを設計します。
         担当エージェント: **Software Architect**
-
+        
   - type: input
-    id: requirement_issue
+    id: requirement-issue
     attributes:
-      label: 要求Issue番号
-      description: 前工程（要求開発）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #123, #124 または #123 #124）
-      placeholder: "#123" または "#123, #124"
+      label: Issue番号 (要件定義)
+      description: 前工程（要求開発）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#123, \#124 または \#123 \#124）
+      placeholder: #123 または #123, #124
     validations:
       required: true
 
@@ -41,10 +41,10 @@ body:
         **継承**: BaseEntity
         
         **フィールド**:
-        - 
+        - fieldName: Type
         
         **リレーション**:
-        - 
+        - relation: RelatedEntity
     validations:
       required: true
 
@@ -59,10 +59,10 @@ body:
         - 外部キー: pet_id → pets(id)
         - インデックス: pet_id, check_in_date
       value: |
-        - テーブル名: 
-        - 主キー: 
-        - 外部キー: 
-        - インデックス: 
+        - テーブル名: table_name
+        - 主キー: id
+        - 外部キー: foreign_key_id
+        - インデックス: index_column
     validations:
       required: true
 
@@ -79,12 +79,12 @@ body:
         - Mapper層: PetHotelStayMapper
         - Controller層: PetHotelStayRestController
       value: |
-        - Entity層: 
-        - Repository層: 
-        - Service層: 
-        - DTO層: 
-        - Mapper層: 
-        - Controller層: 
+        - Entity層: EntityName
+        - Repository層: RepositoryName
+        - Service層: ServiceName
+        - DTO層: DtoName
+        - Mapper層: MapperName
+        - Controller層: ControllerName
     validations:
       required: true
 
@@ -98,7 +98,7 @@ body:
         - カスケード: CascadeType.MERGE
         - フェッチ: FetchType.LAZY
       value: |
-        - 
+        - EntityA → EntityB: @ManyToOne (relationship type)
     validations:
       required: true
 
@@ -112,24 +112,42 @@ body:
         2. BaseEntityを継承する理由: ID管理の統一
         3. LocalDateを使用する理由: 日付のみを扱うため
       value: |
-        1. 
-        2. 
-        3. 
+        1. 決定事項1とその理由
+        2. 決定事項2とその理由
+        3. 決定事項3とその理由
     validations:
       required: true
 
-  - type: checkboxes
+  - type: textarea
     id: consistency_check
     attributes:
       label: 一貫性チェック
       description: 既存アーキテクチャとの整合性確認
-      options:
-        - label: BaseEntityパターンに従っている
-        - label: 既存エンティティと一貫性がある
-        - label: 適切なフェッチ戦略を使用
-        - label: 適切なカスケード設定
-        - label: 命名規則に従っている
+      value: |
+        - [ ] BaseEntityパターンに従っている
+        - [ ] 既存エンティティと一貫性がある
+        - [ ] 適切なフェッチ戦略を使用
+        - [ ] 適切なカスケード設定
+        - [ ] 命名規則に従っている
+    validations:
+      required: true
 
+  - type: textarea
+    id: technical_considerations
+    attributes:
+      label: 技術的考慮事項
+      description: 詳細設計・実装時に考慮すべき事柄
+      placeholder: |
+        - パフォーマンス: N+1問題やインデックス設計
+        - セキュリティ: アクセス管理
+        - 拡張性: 新フィールドの追加
+      value: |
+        - 
+        - 
+        - 
+    validations:
+      required: true
+      
   - type: textarea
     id: acceptance_criteria
     attributes:

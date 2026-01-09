@@ -16,8 +16,8 @@ body:
     id: integration_test_issue
     attributes:
       label: 統合テストIssue番号
-      description: 前工程（統合テスト）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #128, #129 または #128 #129）
-      placeholder: "#128" または "#128, #129"
+      description: 前工程（統合テスト）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#128, \#129 または \#128 \#129）
+      placeholder: #128 または #128, #129
     validations:
       required: true
 

@@ -16,8 +16,8 @@ body:
     id: unit_test_issue
     attributes:
       label: 単体テストIssue番号
-      description: 前工程（単体テスト）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 #127, #128 または #127 #128）
-      placeholder: "#127" または "#127, #128"
+      description: 前工程（単体テスト）のIssue番号（複数の場合はカンマ区切りまたはスペース区切り：例 \#127, \#128 または \#127 \#128）
+      placeholder: #127 または #127, #128
     validations:
       required: true
 
