@@ -164,8 +164,8 @@ mvn dependency:purge-local-repository
 ### Swagger UI が表示されない
 
 **解決策**:
-- ブラウザのキャッシュをクリアしてください
-- 正しいURL `http://localhost:9966/petclinic` を確認してください
+- ブラウザのキャッシュをクリアしてください。
+- 正しいURL `http://localhost:9966/petclinic` を確認してください。
 
 ---
 
