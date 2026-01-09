@@ -32,7 +32,7 @@
 ### 2. リポジトリフォーク（開始3日前）
 
 参加者に以下を依頼:
-1. spring-petclinic-rest リポジトリをフォーク
+1. spring-petclinic-rest リポジトリ [https://github.com/anishi1222/spring-petclinic-rest](https://github.com/anishi1222/spring-petclinic-rest) をフォーク
 2. ローカルにクローン
 3. `mvn clean install` が成功することを確認
 4. `mvn spring-boot:run` でアプリが起動することを確認

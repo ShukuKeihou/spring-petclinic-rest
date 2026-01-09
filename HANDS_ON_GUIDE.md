@@ -55,7 +55,7 @@
 
 ### 0.1 リポジトリのフォークとクローン
 
-1. GitHub で spring-petclinic-rest リポジトリをフォーク
+1. GitHub で spring-petclinic-rest リポジトリ [https://github.com/anishi1222/spring-petclinic-rest](https://github.com/anishi1222/spring-petclinic-rest)をフォーク
 2. ローカルにクローン:
 
 ```bash

@@ -87,7 +87,7 @@ git --version
 
 ### ステップ2: リポジトリのフォークとクローン
 
-1. GitHub で [spring-petclinic-rest](https://github.com/spring-petclinic/spring-petclinic-rest) をフォーク
+1. GitHub で [spring-petclinic-rest](https://github.com/anishi1222/spring-petclinic-rest) をフォーク
 2. ローカルにクローン：
 
 ```bash
